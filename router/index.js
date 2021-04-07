@@ -26,7 +26,7 @@ router.post("/login", urlEncoded, async (req, res) => {
     }
 
     const sessionId = await createSession(user.id);
-    res.cookie("sessionId", sessionId, DEFAULT_COOKIE_OPTIONS).redirect("/");
+    res.cookie("sessionId", sessionId, DEFAULT_COOKIE_OPTIONS).redirect("/dashboard");
   } catch (e) {
     res.status(500).send("Error during login");
   }
@@ -58,7 +58,7 @@ router.post("/signup", urlEncoded, async (req, res) => {
     const userId = await createUser(userData);
     const sessionId = await createSession(userId);
 
-    res.cookie("sessionId", sessionId, DEFAULT_COOKIE_OPTIONS).redirect("/");
+    res.cookie("sessionId", sessionId, DEFAULT_COOKIE_OPTIONS).redirect("/dashboard");
   } catch (e) {
     if (e.code === USER_ALREADY_EXIST_ERROR_CODE) {
       return res.status(409).send("User already exist");

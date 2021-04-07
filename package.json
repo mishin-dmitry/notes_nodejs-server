@@ -6,9 +6,11 @@
   "keywords": [],
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "db:migrate": "knex migrate:latest",
     "test": "echo \"Tests passed\" && exit 0",
-    "build": "rimraf public/bundle.* && rollup --config"
+    "build": "rimraf public/bundle.* && rollup --config",
+    "start": "cross-env npm run db:migrate && node index.js",
+    "dev": "cross-env npm run db:migrate && nodemon index.js -e js,njk"
   },
   "engines": {
     "node": "=12.x || =14.x || =15.x"
@@ -16,6 +18,7 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
+    "cross-env": "^7.0.3",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "knex": "^0.95.4",
@@ -39,6 +42,7 @@
     "eslint-config-prettier": "^7.0.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.3.0",
+    "nodemon": "^2.0.7",
     "regexparam": "^1.3.0",
     "rimraf": "^3.0.2",
     "rollup": "^2.35.1",

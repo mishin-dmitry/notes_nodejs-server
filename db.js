@@ -15,7 +15,7 @@ const getUserById = async (userId) => {
 const findUserBySessionId = async (sessionId) => {
   const session = await knex("sessions")
     .select("user_id")
-    .where({ id: sessionId })
+    .where({ session_id: sessionId })
     .limit(1)
     .then(result => result[0]);
 
@@ -32,7 +32,7 @@ const findUserByName = async (username) => {
 const createSession = async (userId) => {
   const sessionId = nanoid();
 
-  await knex("session").insert({
+  await knex("sessions").insert({
     user_id: userId,
     session_id: sessionId
   });
