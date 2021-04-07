@@ -15,6 +15,10 @@ app.use(express.json());
 app.use(express.static("public"));
 app.use(cookieParser());
 
+// ROUTERS
+app.use("/", require("./router/index"));
+app.use("/dashboard", require("./router/dashboard"));
+
 // Handle uncaught errors
 app.use((err, req, res, next) => {
   res.status(500).send(err.message);
