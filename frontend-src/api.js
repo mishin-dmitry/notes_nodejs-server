@@ -1,7 +1,8 @@
-const PREFIX = "???";
+const PREFIX = "/dashboard/notes";
 
 const req = (url, options = {}) => {
   const { body } = options;
+  debugger
 
   return fetch((PREFIX + url).replace(/\/\/$/, ""), {
     ...options,
@@ -23,7 +24,14 @@ const req = (url, options = {}) => {
   );
 };
 
-export const getNotes = ({ age, search, page } = {}) => {};
+export const getNotes = async ({ age, search, page } = {}) => {
+  try {
+    // TODO age search page
+    return req('');
+  } catch (e) {
+    console.error(e)
+  }
+};
 
 export const createNote = (title, text) => {};
 

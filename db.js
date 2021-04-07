@@ -54,10 +54,15 @@ const createUser = async ({ username, password }) => {
   return id;
 };
 
+const getNotes = async (userId) => {
+  return knex("notes").where({ user_id: userId });
+};
+
 module.exports = {
   findUserBySessionId,
   findUserByName,
   createSession,
   deleteSession,
-  createUser
+  createUser,
+  getNotes
 }
