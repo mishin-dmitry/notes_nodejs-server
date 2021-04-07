@@ -7,7 +7,8 @@
   },
   "plugins": ["prettier"],
   "rules": {
-    "no-process-exit": 0
+    "no-process-exit": 0,
+    "no-unused-vars": ["error", { "argsIgnorePattern": "next" }]
   },
   "settings": {}
 }
