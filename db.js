@@ -55,7 +55,38 @@ const createUser = async ({ username, password }) => {
 };
 
 const getNotes = async (userId) => {
-  return knex("notes").where({ user_id: userId });
+  const notes = await knex("notes").where({ user_id: userId });
+
+  return notes.map(note => ({
+    title: note.title,
+    _id: note.id,
+    isArchived: note['is_archived'],
+    html: note.text,
+    created: note.created
+  }));
+};
+
+const createNote = async ({ userId, title, text }) => {
+  const noteData = {
+    user_id: userId,
+    title,
+    text,
+    is_archived: false,
+    created: new Date()
+  }
+
+  const note = await knex("notes")
+    .insert(noteData)
+    .returning("*")
+    .then(result => result[0]);
+
+  return {
+    title: note.title,
+    _id: note.id,
+    isArchived: note['is_archived'],
+    html: note.text,
+    created: note.created
+  };
 };
 
 module.exports = {
@@ -64,5 +95,6 @@ module.exports = {
   createSession,
   deleteSession,
   createUser,
-  getNotes
+  getNotes,
+  createNote
 }

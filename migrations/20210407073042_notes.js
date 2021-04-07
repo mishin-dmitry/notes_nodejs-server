@@ -3,10 +3,10 @@ exports.up = function(knex) {
     table.increments("id");
     table.integer("user_id");
     table.foreign("user_id").references("users.id");
-    table.string("caption");
+    table.string("title");
     table.string("text");
     table.boolean("is_archived");
-    table.bigInteger("created");
+    table.string("created");
   });
 };
 

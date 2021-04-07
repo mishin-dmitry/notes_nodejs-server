@@ -29,11 +29,22 @@ export const getNotes = async ({ age, search, page } = {}) => {
     // TODO age search page
     return req('');
   } catch (e) {
-    console.error(e)
+    console.error(e);
   }
 };
 
-export const createNote = (title, text) => {};
+export const createNote = async (title, text) => {
+  const requestOptions = {
+    method: 'POST',
+    body: { title, text }
+  };
+
+  try {
+    return req('/new', requestOptions);
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 export const getNote = (id) => {};
 

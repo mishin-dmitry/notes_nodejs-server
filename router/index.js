@@ -22,7 +22,7 @@ router.post("/login", urlEncoded, async (req, res) => {
     const user = await findUserByName(username);
 
     if (!user || user.password !== hash(password)) {
-      return res.redirect("?authError=true");
+      return res.redirect("/?authError=true");
     }
 
     const sessionId = await createSession(user.id);
@@ -45,8 +45,8 @@ router.get("/logout", auth, async (req, res) => {
 router.post("/signup", urlEncoded, async (req, res) => {
   const { username, password } = req.body;
 
-  if (!username || !password) {
-    return res.redirect("/?authErrur=true");
+  if (!username || !password ) {
+    return res.redirect("/?authError=true");
   }
 
   const userData = {
