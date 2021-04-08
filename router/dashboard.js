@@ -1,5 +1,6 @@
 const express = require("express");
 const auth = require("../middlewares/auth");
+const { generatePdf } = require("../utils");
 const { checkUserWithIndexRedirect } = require("../middlewares/checkUser");
 const {
   getNotes,
@@ -164,6 +165,18 @@ router.delete("/notes/delete-archived", auth, checkUserWithIndexRedirect, async 
     res.json({});
   } catch (e) {
     res.status(500).send("Error during deleting archived notes");
+  }
+});
+
+router.post('/note/:id/pdf', auth, checkUserWithIndexRedirect, async (req, res) => {
+  const { id: noteId } = req.params;
+  const userId = req.user?.id;
+
+  try {
+    const note = await getNote(userId, noteId);
+    await generatePdf(note.title, note.html);
+  } catch (e) {
+    res.status(500).send("Error during uploading note");
   }
 });
 
