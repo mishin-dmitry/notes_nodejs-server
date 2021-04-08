@@ -1,6 +1,6 @@
 const express = require("express");
 const auth = require("../middlewares/auth");
-const { checkUserWithSendStatus } = require("../middlewares/checkUser");
+const checkUserWithRedirect = require("../middlewares/checkUser");
 const {
   getNotes,
   createNote,
@@ -16,11 +16,11 @@ const router = express.Router();
 
 const NOTES_CHUNK_SIZE = 20;
 
-router.get("/", auth, checkUserWithSendStatus, (req, res) => {
+router.get("/", auth, checkUserWithRedirect, (req, res) => {
   res.render("dashboard", { username: req.user?.username });
 });
 
-router.get("/notes", auth, checkUserWithSendStatus, async (req, res) => {
+router.get("/notes", auth, checkUserWithRedirect, async (req, res) => {
   const userId = req.user?.id;
   const { age, page, search } = req.query;
 
@@ -46,7 +46,7 @@ router.get("/notes", auth, checkUserWithSendStatus, async (req, res) => {
   }
 });
 
-router.post("/notes/new", auth, checkUserWithSendStatus, async (req, res) => {
+router.post("/notes/new", auth, checkUserWithRedirect, async (req, res) => {
   const userId = req.user?.id;
   const { title, text } = req.body;
 
@@ -58,7 +58,7 @@ router.post("/notes/new", auth, checkUserWithSendStatus, async (req, res) => {
   }
 });
 
-router.get("/note/:id", auth, checkUserWithSendStatus, async (req, res) => {
+router.get("/note/:id", auth, checkUserWithRedirect, async (req, res) => {
   const { id: noteId } = req.params;
   const userId = req.user?.id;
 
@@ -75,7 +75,7 @@ router.get("/note/:id", auth, checkUserWithSendStatus, async (req, res) => {
   }
 });
 
-router.put("/note/:id/archive", auth, checkUserWithSendStatus, async (req, res) => {
+router.put("/note/:id/archive", auth, checkUserWithRedirect, async (req, res) => {
   const { id: noteId } = req.params;
   const userId = req.user?.id;
 
@@ -97,7 +97,7 @@ router.put("/note/:id/archive", auth, checkUserWithSendStatus, async (req, res) 
   }
 });
 
-router.put("/note/:id/unarchive", auth, checkUserWithSendStatus, async (req, res) => {
+router.put("/note/:id/unarchive", auth, checkUserWithRedirect, async (req, res) => {
   const { id: noteId } = req.params;
   const userId = req.user?.id;
 
@@ -119,7 +119,7 @@ router.put("/note/:id/unarchive", auth, checkUserWithSendStatus, async (req, res
   }
 });
 
-router.put("/note/:id/edit", auth, checkUserWithSendStatus, async (req, res) => {
+router.put("/note/:id/edit", auth, checkUserWithRedirect, async (req, res) => {
   const { id: noteId } = req.params;
   const { title, text } = req.body;
   const userId = req.user?.id;
@@ -138,7 +138,7 @@ router.put("/note/:id/edit", auth, checkUserWithSendStatus, async (req, res) => 
   }
 });
 
-router.delete("/note/:id/delete", auth, checkUserWithSendStatus, async (req, res) => {
+router.delete("/note/:id/delete", auth, checkUserWithRedirect, async (req, res) => {
   const { id: noteId } = req.params;
   const userId = req.user?.id;
 
@@ -156,7 +156,7 @@ router.delete("/note/:id/delete", auth, checkUserWithSendStatus, async (req, res
   }
 });
 
-router.delete("/notes/delete-archived", auth, checkUserWithSendStatus, async (req, res) => {
+router.delete("/notes/delete-archived", auth, checkUserWithRedirect, async (req, res) => {
   const userId = req.user?.id;
 
   try {
