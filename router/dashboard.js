@@ -1,7 +1,7 @@
 const express = require("express");
 const auth = require("../middlewares/auth");
 const { checkUserWithSendStatus } = require("../middlewares/checkUser");
-const { getNotes, createNote, findNote, archiveNote, unarchiveNote, updateNoteByUserId } = require("../db");
+const { getNotes, createNote, getNote, archiveNote, unarchiveNote, updateNoteByUserId, deleteNote } = require("../db");
 
 const router = express.Router();
 
@@ -37,7 +37,7 @@ router.get("/note/:id", auth, checkUserWithSendStatus, async (req, res) => {
   const userId = req.user?.id;
 
   try {
-    const note = await findNote(userId, noteId);
+    const note = await getNote(userId, noteId);
 
     if (!note) {
       return res.status(404).send("Note not found");
@@ -54,7 +54,7 @@ router.put("/note/:id/archive", auth, checkUserWithSendStatus, async (req, res) 
   const userId = req.user?.id;
 
   try {
-    const note = await findNote(userId, noteId);
+    const note = await getNote(userId, noteId);
 
     if (!note) {
       return res.status(404).send("Note not found");
@@ -76,7 +76,7 @@ router.put("/note/:id/unarchive", auth, checkUserWithSendStatus, async (req, res
   const userId = req.user?.id;
 
   try {
-    const note = await findNote(userId, noteId);
+    const note = await getNote(userId, noteId);
 
     if (!note) {
       return res.status(404).send("Note not found");
@@ -99,7 +99,7 @@ router.put("/note/:id/edit", auth, checkUserWithSendStatus, async (req, res) => 
   const userId = req.user?.id;
 
   try {
-    const note = await findNote(userId, noteId);
+    const note = await getNote(userId, noteId);
 
     if (!note) {
       return res.status(404).send("Note not found");
@@ -109,6 +109,24 @@ router.put("/note/:id/edit", auth, checkUserWithSendStatus, async (req, res) => 
     res.json({});
   } catch (e) {
     res.status(500).send("Error during updating note");
+  }
+});
+
+router.delete("/note/:id/delete", auth, checkUserWithSendStatus, async (req, res) => {
+  const { id: noteId } = req.params;
+  const userId = req.user?.id;
+
+  try {
+    const note = await getNote(userId, noteId);
+
+    if (!note) {
+      return res.status(404).send("Note not found");
+    }
+
+    await deleteNote(userId, noteId);
+    res.json({});
+  } catch (e) {
+    res.status(500).send("Error during deleting note");
   }
 });
 

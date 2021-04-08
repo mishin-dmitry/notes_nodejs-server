@@ -94,7 +94,7 @@ const createNote = async ({ userId, title, text }) => {
   };
 };
 
-const findNote = async (userId, noteId) => {
+const getNote = async (userId, noteId) => {
   const note = await knex("notes")
     .where({ user_id: userId, id: noteId })
     .limit(1)
@@ -128,6 +128,12 @@ const updateNoteByUserId = async (userId, noteId, { title, text }) => {
     .update({ title, text });
 };
 
+const deleteNote = async (userId, noteId) => {
+  await knex("notes")
+    .where({ user_id: userId, id: noteId })
+    .delete();
+};
+
 module.exports = {
   findUserBySessionId,
   findUserByName,
@@ -136,8 +142,9 @@ module.exports = {
   createUser,
   getNotes,
   createNote,
-  findNote,
+  getNote,
   archiveNote,
   unarchiveNote,
-  updateNoteByUserId
+  updateNoteByUserId,
+  deleteNote
 }

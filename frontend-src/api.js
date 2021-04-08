@@ -88,7 +88,15 @@ export const editNote = async (id, title, text) => {
   }
 };
 
-export const deleteNote = (id) => {};
+export const deleteNote = async (id) => {
+  const requestOption = { method: 'DELETE' };
+
+  try {
+    await req(`/note/${id}/delete`, requestOption);
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 export const deleteAllArchived = () => {};
 
