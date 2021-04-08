@@ -75,7 +75,18 @@ export const unarchiveNote = async (id) => {
   }
 };
 
-export const editNote = (id, title, text) => {};
+export const editNote = async (id, title, text) => {
+  const requestOption = {
+    method: 'PUT',
+    body: { title, text }
+  };
+
+  try {
+    await req(`/note/${id}/edit`, requestOption);
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 export const deleteNote = (id) => {};
 

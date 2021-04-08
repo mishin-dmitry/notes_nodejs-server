@@ -1,7 +1,7 @@
 const express = require("express");
 const auth = require("../middlewares/auth");
 const { checkUserWithSendStatus } = require("../middlewares/checkUser");
-const { getNotes, createNote, findNote, archiveNote, unarchiveNote } = require("../db");
+const { getNotes, createNote, findNote, archiveNote, unarchiveNote, updateNoteByUserId } = require("../db");
 
 const router = express.Router();
 
@@ -90,6 +90,25 @@ router.put("/note/:id/unarchive", auth, checkUserWithSendStatus, async (req, res
     res.json({});
   } catch (e) {
     res.status(500).send('Error during unarchiving note');
+  }
+});
+
+router.put("/note/:id/edit", auth, checkUserWithSendStatus, async (req, res) => {
+  const { id: noteId } = req.params;
+  const { title, text } = req.body;
+  const userId = req.user?.id;
+
+  try {
+    const note = await findNote(userId, noteId);
+
+    if (!note) {
+      return res.status(404).send("Note not found");
+    }
+
+    await updateNoteByUserId(userId, noteId, { title, text });
+    res.json({});
+  } catch (e) {
+    res.status(500).send("Error during updating note");
   }
 });
 
