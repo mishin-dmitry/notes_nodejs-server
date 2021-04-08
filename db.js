@@ -60,56 +60,89 @@ const createUser = async ({ username, password }) => {
   return id;
 };
 
-const getNotes = async (userId, { age, page, search }) => {
-  const notes = await knex("notes").where({ user_id: userId });
 
+const getNotes = async (userId, { age, limit, offset, search }) => {
   switch (age) {
     case 'archive':
-      return _getArchivedNotes(notes);
+      return _getArchivedNotes(userId, limit, offset);
 
     case '1month':
-      return _getMonthAgoNotes(notes);
+      return _getMonthAgoNotes(userId, limit, offset);
 
     case '3months':
-      return _getThreeMonthAgoNotes(notes);
+      return _getThreeMonthAgoNotes(userId, limit, offset);
 
     case 'alltime':
-      return _getAllNotes(notes);
+      return _getAllNotes(userId, limit, offset);
 
-    default:return [];
+    default: return {};
   }
 };
 
-const _getMonthAgoNotes = (notes) => {
+const _getNotesForClient = (notes) => {
+  return notes.map(note => ({
+    title: note.title,
+    _id: note.id,
+    isArchived: note['is_archived'],
+    html: md.render(note.text),
+    created: note.created
+  }));
+}
+
+const _getMonthAgoNotes = async (userId, limit, offset) => {
   const monthAgo = moment().subtract(30, 'days');
   const now = moment();
 
-  const filteredNotes = notes.filter(note => moment(note.created).isBetween(monthAgo, now));
+  const allNotes =  await knex("notes")
+    .where({ user_id: userId });
 
-  return _getAllNotes(filteredNotes);
+  const filteredNotes = allNotes.filter(note => moment(note.created).isBetween(monthAgo, now));
+
+  const data = filteredNotes.slice(offset, offset + limit);
+
+  return { data: _getNotesForClient(data), count: filteredNotes.length };
 };
 
-const _getThreeMonthAgoNotes = (notes) => {
+const _getThreeMonthAgoNotes = async (userId, limit, offset) => {
   const threeMonthAgo = moment().subtract(90, 'days');
   const now = moment();
 
-  const filteredNotes = notes.filter(note => moment(note.created).isBetween(threeMonthAgo, now));
+  const allNotes =  await knex("notes")
+    .where({ user_id: userId });
 
-  return _getAllNotes(filteredNotes);
+  const filteredNotes = allNotes.filter(note => moment(note.created).isBetween(threeMonthAgo, now));
+
+  const data = filteredNotes.slice(offset, offset + limit);
+
+  return { data: _getNotesForClient(data), count: filteredNotes.length };
 };
 
-const _getArchivedNotes = (notes) => {
-  return _getAllNotes(notes.filter(note => note['is_archived']));
+const _getArchivedNotes = async (userId, limit, offset) => {
+  const { count } = await knex("notes")
+    .where({ user_id: userId, is_archived: true })
+    .count()
+    .then(result => result[0]);
+
+  const data = await knex("notes")
+    .where({ user_id: userId, is_archived: true })
+    .limit(limit)
+    .offset(offset);
+
+  return { data: _getNotesForClient(data), count: +count };
 };
 
-const _getAllNotes = (notes) => {
-  return notes.map(note => ({
-      title: note.title,
-      _id: note.id,
-      isArchived: note['is_archived'],
-      html: md.render(note.text),
-      created: note.created
-    }));
+const _getAllNotes = async (userId, limit, offset) => {
+  const { count } = await knex("notes")
+    .where({ user_id: userId })
+    .count()
+    .then(result => result[0]);
+
+  const data = await knex("notes")
+    .where({ user_id: userId})
+    .limit(limit)
+    .offset(offset);
+
+  return { data: _getNotesForClient(data), count: +count };
 };
 
 const createNote = async ({ userId, title, text }) => {

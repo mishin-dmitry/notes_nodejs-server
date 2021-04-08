@@ -14,6 +14,8 @@ const {
 
 const router = express.Router();
 
+const NOTES_CHUNK_SIZE = 20;
+
 router.get("/", auth, checkUserWithSendStatus, (req, res) => {
   res.render("dashboard", { username: req.user?.username });
 });
@@ -22,9 +24,23 @@ router.get("/notes", auth, checkUserWithSendStatus, async (req, res) => {
   const userId = req.user?.id;
   const { age, page, search } = req.query;
 
+  const currentPage = page ?? 1;
+  const offset = (currentPage - 1) * NOTES_CHUNK_SIZE;
+
   try {
-    const notes = await getNotes(userId, { age, page, search });
-    res.json({ data: notes });
+    const filterData = {
+      age,
+      limit: NOTES_CHUNK_SIZE,
+      offset,
+      page: currentPage,
+      search
+    };
+
+    const { data, count } = await getNotes(userId, filterData);
+    res.json({
+      data,
+      hasMore: count > currentPage * NOTES_CHUNK_SIZE
+    });
   } catch (e) {
     res.status(500).send("Error during getting notes");
   }
