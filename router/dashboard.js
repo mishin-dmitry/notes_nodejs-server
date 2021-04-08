@@ -65,7 +65,7 @@ router.put("/note/:id/archive", auth, checkUserWithSendStatus, async (req, res) 
     }
 
     await archiveNote(userId, noteId);
-    res.sendStatus(204);
+    res.json({});
   } catch (e) {
     res.status(500).send('Error during archiving note');
   }
@@ -87,7 +87,7 @@ router.put("/note/:id/unarchive", auth, checkUserWithSendStatus, async (req, res
     }
 
     await unarchiveNote(userId, noteId);
-    res.sendStatus(204);
+    res.json({});
   } catch (e) {
     res.status(500).send('Error during unarchiving note');
   }

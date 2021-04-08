@@ -15,11 +15,13 @@ const req = (url, options = {}) => {
         : null),
     },
   }).then((res) =>
-    res.ok
-      ? res.json()
-      : res.text().then((message) => {
+    {
+      return  res.ok
+        ? res.json()
+        : res.text().then((message) => {
           throw new Error(message);
         })
+    }
   );
 };
 
