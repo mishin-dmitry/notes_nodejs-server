@@ -2,7 +2,6 @@ const PREFIX = "/dashboard";
 
 const req = (url, options = {}) => {
   const { body } = options;
-  debugger
 
   return fetch((PREFIX + url).replace(/\/\/$/, ""), {
     ...options,
@@ -47,18 +46,32 @@ export const createNote = async (title, text) => {
 };
 
 export const getNote = async (id) => {
-  console.log("GETTING NOTE")
   try {
-    console.log(req(`/note/${id}`));
     return req(`/note/${id}`);
   } catch (e) {
     console.error(e);
   }
 };
 
-export const archiveNote = {};
+export const archiveNote = async (id) => {
+  const requestOption = { method: 'PUT' };
 
-export const unarchiveNote = {};
+  try {
+    await req(`/note/${id}/archive`, requestOption);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+export const unarchiveNote = async (id) => {
+  const requestOption = { method: 'PUT' };
+
+  try {
+    await req(`/note/${id}/unarchive`, requestOption);
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 export const editNote = (id, title, text) => {};
 

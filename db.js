@@ -109,6 +109,18 @@ const findNote = async (userId, noteId) => {
   };
 };
 
+const archiveNote = async (userId, noteId) => {
+  await knex("notes")
+    .where({ user_id: userId, id: noteId })
+    .update({ is_archived: true });
+};
+
+const unarchiveNote = async (userId, noteId) => {
+  await knex("notes")
+    .where({ user_id: userId, id: noteId })
+    .update({ is_archived: false });
+}
+
 module.exports = {
   findUserBySessionId,
   findUserByName,
@@ -117,5 +129,7 @@ module.exports = {
   createUser,
   getNotes,
   createNote,
-  findNote
+  findNote,
+  archiveNote,
+  unarchiveNote
 }
