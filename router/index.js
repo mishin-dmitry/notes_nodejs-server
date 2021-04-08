@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const auth = require("../middlewares/auth");
+const { checkUserWithDashboardRedirect } = require("../middlewares/checkUser");
 const { hash } = require("../utils");
 const { findUserByName, createSession, deleteSession, createUser } = require("../db");
 
@@ -68,7 +69,7 @@ router.post("/signup", urlEncoded, async (req, res) => {
   }
 });
 
-router.get("/", auth, (req, res) => {
+router.get("/", auth, checkUserWithDashboardRedirect,  (req, res) => {
   res.render("index", {
     user: req.user,
     authError: req.query.authError === "true" ? "Wrong username or password" : req.query.authError,
