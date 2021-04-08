@@ -1,4 +1,4 @@
-const PREFIX = "/dashboard/notes";
+const PREFIX = "/dashboard";
 
 const req = (url, options = {}) => {
   const { body } = options;
@@ -27,7 +27,7 @@ const req = (url, options = {}) => {
 export const getNotes = async ({ age, search, page } = {}) => {
   try {
     // TODO age search page
-    return req('');
+    return req('/notes');
   } catch (e) {
     console.error(e);
   }
@@ -40,13 +40,21 @@ export const createNote = async (title, text) => {
   };
 
   try {
-    return req('/new', requestOptions);
+    return req('/notes/new', requestOptions);
   } catch (e) {
     console.error(e);
   }
 };
 
-export const getNote = (id) => {};
+export const getNote = async (id) => {
+  console.log("GETTING NOTE")
+  try {
+    console.log(req(`/note/${id}`));
+    return req(`/note/${id}`);
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 export const archiveNote = {};
 

@@ -2,6 +2,11 @@ require("dotenv").config();
 
 const { client, connection } = require('./knexfile');
 const { nanoid } = require("nanoid");
+const md = require("markdown-it")({
+  html: true,
+  linkify: true,
+  typographer: true
+});
 
 const knex = require("knex")({ client, connection });
 
@@ -61,7 +66,7 @@ const getNotes = async (userId) => {
     title: note.title,
     _id: note.id,
     isArchived: note['is_archived'],
-    html: note.text,
+    html: md.render(note.text),
     created: note.created
   }));
 };
@@ -84,7 +89,22 @@ const createNote = async ({ userId, title, text }) => {
     title: note.title,
     _id: note.id,
     isArchived: note['is_archived'],
-    html: note.text,
+    html: md.render(note.text),
+    created: note.created
+  };
+};
+
+const findNote = async (userId, noteId) => {
+  const note = await knex("notes")
+    .where({ user_id: userId, id: noteId })
+    .limit(1)
+    .then(result => result[0]);
+
+  return note && {
+    title: note.title,
+    _id: note.id,
+    isArchived: note['is_archived'],
+    html: md.render(note.text),
     created: note.created
   };
 };
@@ -96,5 +116,6 @@ module.exports = {
   deleteSession,
   createUser,
   getNotes,
-  createNote
+  createNote,
+  findNote
 }
