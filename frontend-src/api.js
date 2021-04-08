@@ -98,6 +98,14 @@ export const deleteNote = async (id) => {
   }
 };
 
-export const deleteAllArchived = () => {};
+export const deleteAllArchived = async () => {
+  const requestOption = { method: 'DELETE' };
+
+  try {
+    await req("/notes/delete-archived", requestOption);
+  } catch (e) {
+    console.error(e)
+  }
+};
 
 export const notePdfUrl = (id) => {};

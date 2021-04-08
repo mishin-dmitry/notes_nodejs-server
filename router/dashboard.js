@@ -1,7 +1,7 @@
 const express = require("express");
 const auth = require("../middlewares/auth");
 const { checkUserWithSendStatus } = require("../middlewares/checkUser");
-const { getNotes, createNote, getNote, archiveNote, unarchiveNote, updateNoteByUserId, deleteNote } = require("../db");
+const { getNotes, createNote, getNote, archiveNote, unarchiveNote, updateNoteByUserId, deleteNote, deletingArchivedNotes } = require("../db");
 
 const router = express.Router();
 
@@ -127,6 +127,17 @@ router.delete("/note/:id/delete", auth, checkUserWithSendStatus, async (req, res
     res.json({});
   } catch (e) {
     res.status(500).send("Error during deleting note");
+  }
+});
+
+router.delete("/notes/delete-archived", auth, checkUserWithSendStatus, async (req, res) => {
+  const userId = req.user?.id;
+
+  try {
+    await deletingArchivedNotes(userId);
+    res.json({});
+  } catch (e) {
+    res.status(500).send("Error during deleting archived notes");
   }
 });
 

@@ -134,6 +134,12 @@ const deleteNote = async (userId, noteId) => {
     .delete();
 };
 
+const deletingArchivedNotes = async (userId) => {
+  await knex("notes")
+    .where({ user_id: userId, is_archived: true })
+    .delete();
+};
+
 module.exports = {
   findUserBySessionId,
   findUserByName,
@@ -146,5 +152,6 @@ module.exports = {
   archiveNote,
   unarchiveNote,
   updateNoteByUserId,
-  deleteNote
+  deleteNote,
+  deletingArchivedNotes
 }
