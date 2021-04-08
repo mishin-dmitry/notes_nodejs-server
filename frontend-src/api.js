@@ -27,8 +27,15 @@ const req = (url, options = {}) => {
 
 export const getNotes = async ({ age, search, page } = {}) => {
   try {
-    // TODO age search page
-    return req('/notes');
+    const ageParam = age ? `age=${age}` : '';
+    const searchParam = search ? `search=${search}` : '';
+    const pageParam = page ? `page=${page}` : '';
+    const queryParams = [ageParam, searchParam, pageParam]
+      .filter(param => param)
+      .join("&");
+    const queryString = queryParams ? `?${queryParams}` : '';
+
+    return req(`/notes${queryString}`);
   } catch (e) {
     console.error(e);
   }

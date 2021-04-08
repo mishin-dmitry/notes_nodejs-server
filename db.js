@@ -7,6 +7,7 @@ const md = require("markdown-it")({
   linkify: true,
   typographer: true
 });
+const moment = require("moment");
 
 const knex = require("knex")({ client, connection });
 
@@ -59,16 +60,56 @@ const createUser = async ({ username, password }) => {
   return id;
 };
 
-const getNotes = async (userId) => {
+const getNotes = async (userId, { age, page, search }) => {
   const notes = await knex("notes").where({ user_id: userId });
 
+  switch (age) {
+    case 'archive':
+      return _getArchivedNotes(notes);
+
+    case '1month':
+      return _getMonthAgoNotes(notes);
+
+    case '3months':
+      return _getThreeMonthAgoNotes(notes);
+
+    case 'alltime':
+      return _getAllNotes(notes);
+
+    default:return [];
+  }
+};
+
+const _getMonthAgoNotes = (notes) => {
+  const monthAgo = moment().subtract(30, 'days');
+  const now = moment();
+
+  const filteredNotes = notes.filter(note => moment(note.created).isBetween(monthAgo, now));
+
+  return _getAllNotes(filteredNotes);
+};
+
+const _getThreeMonthAgoNotes = (notes) => {
+  const threeMonthAgo = moment().subtract(90, 'days');
+  const now = moment();
+
+  const filteredNotes = notes.filter(note => moment(note.created).isBetween(threeMonthAgo, now));
+
+  return _getAllNotes(filteredNotes);
+};
+
+const _getArchivedNotes = (notes) => {
+  return _getAllNotes(notes.filter(note => note['is_archived']));
+};
+
+const _getAllNotes = (notes) => {
   return notes.map(note => ({
-    title: note.title,
-    _id: note.id,
-    isArchived: note['is_archived'],
-    html: md.render(note.text),
-    created: note.created
-  }));
+      title: note.title,
+      _id: note.id,
+      isArchived: note['is_archived'],
+      html: md.render(note.text),
+      created: note.created
+    }));
 };
 
 const createNote = async ({ userId, title, text }) => {

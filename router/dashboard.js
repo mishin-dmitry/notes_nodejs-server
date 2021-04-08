@@ -1,7 +1,16 @@
 const express = require("express");
 const auth = require("../middlewares/auth");
 const { checkUserWithSendStatus } = require("../middlewares/checkUser");
-const { getNotes, createNote, getNote, archiveNote, unarchiveNote, updateNoteByUserId, deleteNote, deletingArchivedNotes } = require("../db");
+const {
+  getNotes,
+  createNote,
+  getNote,
+  archiveNote,
+  unarchiveNote,
+  updateNoteByUserId,
+  deleteNote,
+  deletingArchivedNotes
+} = require("../db");
 
 const router = express.Router();
 
@@ -11,9 +20,10 @@ router.get("/", auth, checkUserWithSendStatus, (req, res) => {
 
 router.get("/notes", auth, checkUserWithSendStatus, async (req, res) => {
   const userId = req.user?.id;
+  const { age, page, search } = req.query;
 
   try {
-    const notes = await getNotes(userId);
+    const notes = await getNotes(userId, { age, page, search });
     res.json({ data: notes });
   } catch (e) {
     res.status(500).send("Error during getting notes");
