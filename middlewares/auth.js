@@ -15,6 +15,7 @@ const auth = async (req, res, next) => {
 
     req.user = user;
     req.sessionId = sessionId;
+    req.isNew = !user['last_login'];
     next();
   } catch (e) {
     console.error(e);

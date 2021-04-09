@@ -8,12 +8,6 @@ const { findUserByName, createSession, deleteSession, createUser } = require("..
 const router = express.Router();
 const urlEncoded = bodyParser.urlencoded({ extended: true });
 
-const ONE_HOUR = 60 * 60 * 1000;
-const COOKIE_EXPIRES_TIME = new Date(Date.now() + ONE_HOUR);
-const DEFAULT_COOKIE_OPTIONS = {
-  expires: COOKIE_EXPIRES_TIME,
-  httpOnly: true,
-};
 const USER_ALREADY_EXIST_ERROR_CODE = "23505";
 
 router.post("/login", urlEncoded, async (req, res) => {
@@ -27,7 +21,7 @@ router.post("/login", urlEncoded, async (req, res) => {
     }
 
     const sessionId = await createSession(user.id);
-    res.cookie("sessionId", sessionId, DEFAULT_COOKIE_OPTIONS).redirect("/dashboard");
+    res.cookie("sessionId", sessionId).redirect("/dashboard");
   } catch (e) {
     res.status(500).send("Error during login");
   }
@@ -59,13 +53,13 @@ router.post("/signup", urlEncoded, async (req, res) => {
     const userId = await createUser(userData);
     const sessionId = await createSession(userId);
 
-    res.cookie("sessionId", sessionId, DEFAULT_COOKIE_OPTIONS).redirect("/dashboard");
+    res.cookie("sessionId", sessionId).redirect("/dashboard");
   } catch (e) {
     if (e.code === USER_ALREADY_EXIST_ERROR_CODE) {
-      return res.status(409).send("User already exist");
+      return res.redirect("/?authError=User already exist");
     }
 
-    res.status(500).send("Error during sign up")
+    res.status(500).send("Error during sign up");
   }
 });
 

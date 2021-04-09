@@ -29,6 +29,10 @@ const findUserBySessionId = async (sessionId) => {
 };
 
 const findUserByName = async (username) => {
+  await knex("users")
+    .where({ username })
+    .update({ "last_login": new Date() });
+
   return knex("users")
     .where({ username })
     .limit(1)
@@ -60,6 +64,36 @@ const createUser = async ({ username, password }) => {
   return id;
 };
 
+const getDemo = async (userId) => {
+  return knex("notes")
+    .where({ user_id: userId, is_demo: true })
+    .limit(1)
+    .then(result => result[0]);
+};
+
+const deleteDemo = async (userId) => {
+  return knex("notes")
+    .where({ user_id: userId, is_demo: true })
+    .limit(1)
+    .delete();
+};
+
+const createDemo = async (userId) => {
+  const demoData = {
+    user_id: userId,
+    title: 'Demo',
+    text: "# Это тестовая земетка\n*чтобы продемонстрировать фукционал*\n**Нашего сервера**\n> Спасибо, что выбрали нас",
+    is_archived: false,
+    is_demo: true,
+    created: new Date()
+  };
+
+  const demo = await knex("notes")
+    .insert(demoData)
+    .returning('*');
+
+  return _getNotesForClient(demo);
+}
 
 const getNotes = async (userId, { age, limit, offset, search }) => {
   switch (age) {
@@ -93,8 +127,9 @@ const _getMonthAgoNotes = async (userId, limit, offset) => {
   const monthAgo = moment().subtract(30, 'days');
   const now = moment();
 
-  const allNotes =  await knex("notes")
-    .where({ user_id: userId });
+  const allNotes = await knex("notes")
+    .where({ user_id: userId })
+    .whereNull("is_demo");
 
   const filteredNotes = allNotes.filter(note => moment(note.created).isBetween(monthAgo, now));
 
@@ -108,7 +143,7 @@ const _getThreeMonthAgoNotes = async (userId, limit, offset) => {
   const now = moment();
 
   const allNotes =  await knex("notes")
-    .where({ user_id: userId });
+    .where({ user_id: userId, is_demo: false });
 
   const filteredNotes = allNotes.filter(note => moment(note.created).isBetween(threeMonthAgo, now));
 
@@ -119,12 +154,20 @@ const _getThreeMonthAgoNotes = async (userId, limit, offset) => {
 
 const _getArchivedNotes = async (userId, limit, offset) => {
   const { count } = await knex("notes")
-    .where({ user_id: userId, is_archived: true })
+    .where({
+      user_id: userId,
+      is_archived: true
+    })
+    .whereNull("is_demo")
     .count()
     .then(result => result[0]);
 
   const data = await knex("notes")
-    .where({ user_id: userId, is_archived: true })
+    .where({
+      user_id: userId,
+      is_archived: true
+    })
+    .whereNull("is_demo")
     .limit(limit)
     .offset(offset);
 
@@ -134,11 +177,13 @@ const _getArchivedNotes = async (userId, limit, offset) => {
 const _getAllNotes = async (userId, limit, offset) => {
   const { count } = await knex("notes")
     .where({ user_id: userId })
+    .whereNull("is_demo")
     .count()
     .then(result => result[0]);
 
   const data = await knex("notes")
-    .where({ user_id: userId})
+    .where({ user_id: userId })
+    .whereNull("is_demo")
     .limit(limit)
     .offset(offset);
 
@@ -170,7 +215,10 @@ const createNote = async ({ userId, title, text }) => {
 
 const getNote = async (userId, noteId) => {
   const note = await knex("notes")
-    .where({ user_id: userId, id: noteId })
+    .where({
+      user_id: userId,
+      id: noteId
+    })
     .limit(1)
     .then(result => result[0]);
 
@@ -227,5 +275,8 @@ module.exports = {
   unarchiveNote,
   updateNoteByUserId,
   deleteNote,
-  deletingArchivedNotes
+  deletingArchivedNotes,
+  createDemo,
+  getDemo,
+  deleteDemo
 }

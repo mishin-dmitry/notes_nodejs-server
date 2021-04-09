@@ -11,7 +11,10 @@ const {
   unarchiveNote,
   updateNoteByUserId,
   deleteNote,
-  deletingArchivedNotes
+  deletingArchivedNotes,
+  createDemo,
+  getDemo,
+  deleteDemo
 } = require("../db");
 
 const router = express.Router();
@@ -28,17 +31,24 @@ router.get("/notes", auth, checkUserWithIndexRedirect, async (req, res) => {
 
   const currentPage = page ?? 1;
   const offset = (currentPage - 1) * NOTES_CHUNK_SIZE;
+  const filterData = {
+    age,
+    limit: NOTES_CHUNK_SIZE,
+    offset,
+    page: currentPage,
+    search
+  };
 
   try {
-    const filterData = {
-      age,
-      limit: NOTES_CHUNK_SIZE,
-      offset,
-      page: currentPage,
-      search
-    };
-
+    let demo = await getDemo(userId);
     const { data, count } = await getNotes(userId, filterData);
+    if (req.isNew && !count) {
+      demo = demo ?? await createDemo(userId);
+      return res.json({ data: demo, hasMore: false });
+    } else {
+      demo && await deleteDemo(userId);
+    }
+
     res.json({
       data,
       hasMore: count > currentPage * NOTES_CHUNK_SIZE

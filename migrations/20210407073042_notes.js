@@ -6,8 +6,9 @@ exports.up = function(knex) {
     table.string("title");
     table.string("text");
     table.boolean("is_archived");
+    table.boolean("is_demo");
     table.string("created");
-  });
+  })
 };
 
 exports.down = function(knex) {
