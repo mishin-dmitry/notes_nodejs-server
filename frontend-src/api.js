@@ -115,6 +115,6 @@ export const deleteAllArchived = async () => {
   }
 };
 
-export const notePdfUrl = async (id) => {
-  return `/note/${id}/note.pdf`;
+export const notePdfUrl = (id) => {
+  return `${PREFIX}/note/${id}/download`;
 };

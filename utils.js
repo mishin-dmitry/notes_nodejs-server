@@ -27,7 +27,7 @@ async function generatePdf(title, html) {
         </body>
       </html>
   `);
-    await page.pdf({ path: 'note.pdf', format: 'A4', });
+    await page.pdf({ path: 'files/note.pdf', format: 'A4', });
     await browser.close();
   } catch (e) {
     console.error(e);
